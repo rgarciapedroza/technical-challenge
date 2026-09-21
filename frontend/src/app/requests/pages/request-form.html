@@ -1,0 +1,72 @@
+<a routerLink="/requests">Back to requests</a>
+<h1>{{ editing() ? 'Edit request' : 'New request' }}</h1>
+@switch (state()) {
+  @case ('loading') { <p role="status">Loading request...</p> }
+  @case ('invalid') { <p role="alert">Invalid request ID.</p> }
+  @case ('not-found') {
+    <p role="alert">Request not found.</p>
+    <button class="button" type="button" (click)="retry()">Retry</button>
+  }
+  @case ('error') {
+    <p role="alert">Unable to load request.</p>
+    <button class="button" type="button" (click)="retry()">Retry</button>
+  }
+  @case ('ready') {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <fieldset [disabled]="saving()">
+        <legend class="visually-hidden">Request information</legend>
+        <label for="title">Title</label>
+        <input id="title" formControlName="title" maxlength="120" required
+          [attr.aria-invalid]="form.controls.title.touched && form.controls.title.invalid"
+          aria-describedby="title-error">
+        <div id="title-error" class="validation">
+          @if (form.controls.title.touched) {
+            @if (form.controls.title.hasError('required')) { <p>Title is required.</p> }
+            @if (form.controls.title.hasError('maxlength')) { <p>Title must not exceed 120 characters.</p> }
+          }
+        </div>
+
+        <label for="description">Description</label>
+        <textarea id="description" formControlName="description" rows="6" maxlength="2000" required
+          [attr.aria-invalid]="form.controls.description.touched && form.controls.description.invalid"
+          aria-describedby="description-error"></textarea>
+        <div id="description-error" class="validation">
+          @if (form.controls.description.touched) {
+            @if (form.controls.description.hasError('required')) { <p>Description is required.</p> }
+            @if (form.controls.description.hasError('maxlength')) { <p>Description must not exceed 2000 characters.</p> }
+          }
+        </div>
+
+        <label for="category">Category</label>
+        <select id="category" formControlName="category" required aria-describedby="category-error">
+          <option value="">Select a category</option>
+          @for (entry of categories; track entry[0]) { <option [value]="entry[0]">{{ entry[1] }}</option> }
+        </select>
+        <div id="category-error" class="validation">
+          @if (form.controls.category.touched && form.controls.category.invalid) { <p>Category is required.</p> }
+        </div>
+
+        <label for="priority">Priority</label>
+        <select id="priority" formControlName="priority" required aria-describedby="priority-error">
+          <option value="">Select a priority</option>
+          @for (entry of priorities; track entry[0]) { <option [value]="entry[0]">{{ entry[1] }}</option> }
+        </select>
+        <div id="priority-error" class="validation">
+          @if (form.controls.priority.touched && form.controls.priority.invalid) { <p>Priority is required.</p> }
+        </div>
+
+        @if (editing()) {
+          <label for="status">Status</label>
+          <select id="status" formControlName="status" required aria-describedby="status-error">
+            @for (entry of statuses; track entry[0]) { <option [value]="entry[0]">{{ entry[1] }}</option> }
+          </select>
+          <div id="status-error" class="validation">
+            @if (form.controls.status.touched && form.controls.status.invalid) { <p>Status is required.</p> }
+          </div>
+        }
+        <button class="button" type="submit">{{ saving() ? 'Saving...' : (editing() ? 'Save changes' : 'Create request') }}</button>
+      </fieldset>
+      @if (saveError()) { <p role="alert">Unable to save the request. Please try again.</p> }
+    </form>
+  }
+}

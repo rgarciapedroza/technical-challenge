@@ -1,0 +1,42 @@
+<a routerLink="/requests">Back to requests</a>
+<h1>Request details</h1>
+
+@if (state$ | async; as state) {
+  @switch (state.status) {
+    @case ('loading') {
+      <p role="status">Loading request...</p>
+    }
+    @case ('invalid') {
+      <p role="alert">Invalid request ID.</p>
+    }
+    @case ('not-found') {
+      <p role="alert">Request not found.</p>
+      <button class="button" type="button" (click)="retry()">Retry</button>
+    }
+    @case ('error') {
+      <p role="alert">Unable to load request.</p>
+      <button class="button" type="button" (click)="retry()">Retry</button>
+    }
+    @case ('loaded') {
+      <article>
+        <header>
+          <h2>{{ state.request.title }}</h2>
+          <a class="button" [routerLink]="['/requests', state.request.id, 'edit']">Edit request</a>
+        </header>
+        @if (state.request.needsAttention) {
+          <p class="attention">Needs attention</p>
+        }
+        <h3>Description</h3>
+        <p class="description">{{ state.request.description }}</p>
+        <dl>
+          <div><dt>Category</dt><dd>{{ categories[state.request.category] }}</dd></div>
+          <div><dt>Priority</dt><dd>{{ priorities[state.request.priority] }}</dd></div>
+          <div><dt>Status</dt><dd>{{ statuses[state.request.status] }}</dd></div>
+          <div><dt>Created</dt><dd><time [attr.datetime]="state.request.createdAt">{{ state.request.createdAt | date:'dd-MM-yyyy HH:mm:ss' }}</time></dd></div>
+          <div><dt>Updated</dt><dd><time [attr.datetime]="state.request.updatedAt">{{ state.request.updatedAt | date:'dd-MM-yyyy HH:mm:ss' }}</time></dd></div>
+        </dl>
+        <p class="date-note">Dates and times are shown in your local time zone.</p>
+      </article>
+    }
+  }
+}
