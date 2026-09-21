@@ -13,6 +13,25 @@
       </div>
     }
     @case ('loaded') {
+      <section class="summary-grid" aria-label="Requests summary">
+        <div class="summary-card">
+          <span class="summary-label">Total requests</span>
+          <span class="summary-value">{{ state.summary.total }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Completed</span>
+          <span class="summary-value">{{ state.summary.completed }}</span>
+        </div>
+        <div class="summary-card attention-card">
+          <span class="summary-label">Needs attention</span>
+          <span class="summary-value">{{ state.summary.needsAttention }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">In progress</span>
+          <span class="summary-value">{{ state.summary.inProgress }}</span>
+        </div>
+      </section>
+
       @if (state.allRequests.length === 0) {
         <div class="empty">
           <p role="status">No requests found.</p>

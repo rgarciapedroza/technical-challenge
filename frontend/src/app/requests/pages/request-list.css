@@ -1,6 +1,51 @@
 .intro, .date-note { color: #4b5870; }
 .date-note { font-size: 0.875rem; }
 
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #dce3ec;
+  border-radius: 0.5rem;
+  gap: 0.25rem;
+}
+
+.summary-card.attention-card {
+  border-color: #fcd5c5;
+  background: #fffafa;
+}
+
+.summary-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #4b5870;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.summary-card.attention-card .summary-label {
+  color: #8b290e;
+}
+
+.summary-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.summary-card.attention-card .summary-value {
+  color: #8b290e;
+}
+
 .filters-toolbar {
   display: flex;
   flex-wrap: wrap;

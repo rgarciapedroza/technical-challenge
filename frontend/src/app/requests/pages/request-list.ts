@@ -68,6 +68,38 @@ export function filterAndSortRequests(
     .sort((a, b) => compareRequests(a, b, criteria.sort));
 }
 
+export interface SummaryIndicators {
+  total: number;
+  completed: number;
+  needsAttention: number;
+  inProgress: number;
+}
+
+export function calculateSummary(requests: readonly RequestResponse[]): SummaryIndicators {
+  let completed = 0;
+  let needsAttention = 0;
+  let inProgress = 0;
+
+  for (const req of requests) {
+    if (req.status === 'DONE') {
+      completed++;
+    }
+    if (req.needsAttention) {
+      needsAttention++;
+    }
+    if (req.status === 'IN_PROGRESS') {
+      inProgress++;
+    }
+  }
+
+  return {
+    total: requests.length,
+    completed,
+    needsAttention,
+    inProgress,
+  };
+}
+
 type ListState =
   | { status: 'loading' }
   | { status: 'error' }
@@ -76,6 +108,7 @@ type ListState =
       requests: RequestResponse[];
       allRequests: RequestResponse[];
       hasFiltersApplied: boolean;
+      summary: SummaryIndicators;
     };
 
 @Component({
@@ -141,11 +174,14 @@ export class RequestList {
         criteria.status !== 'ALL' ||
         criteria.sort !== 'A-Z';
 
+      const summary = calculateSummary(allRequests);
+
       return {
         status: 'loaded' as const,
         requests: filtered,
         allRequests,
         hasFiltersApplied,
+        summary,
       };
     }),
   );

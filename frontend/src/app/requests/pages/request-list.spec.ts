@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
-import { RequestList, normalizeText, filterAndSortRequests, compareRequests } from './request-list';
+import { RequestList, normalizeText, filterAndSortRequests, compareRequests, calculateSummary } from './request-list';
 import { RequestService } from '../services/request.service';
 import { RequestResponse } from '../models/request';
 
@@ -38,13 +38,19 @@ describe('RequestList', () => {
     expect(findAll).toHaveBeenCalledTimes(1);
   });
 
-  it('shows the empty state only after a successful empty result', async () => {
+  it('shows the empty state with zero counters only after a successful empty result', async () => {
     response.next([]);
     await fixture.whenStable();
     expect(element().textContent).toContain('No requests found.');
     expect(element().textContent).not.toContain('Loading requests...');
     expect(element().querySelector('a')?.getAttribute('href')).toBe('/requests/new');
     expect(element().querySelector('.filters-toolbar')).toBeNull();
+    expect(element().querySelector('.summary-grid')).not.toBeNull();
+    const values = element().querySelectorAll('.summary-value');
+    expect(values[0].textContent).toBe('0');
+    expect(values[1].textContent).toBe('0');
+    expect(values[2].textContent).toBe('0');
+    expect(values[3].textContent).toBe('0');
   });
 
   it('renders request links, labels, attention and browser-local dates', async () => {
@@ -82,6 +88,7 @@ describe('RequestList', () => {
     expect(element().textContent).not.toContain('Private database information');
     expect(element().textContent).not.toContain('No requests found.');
     expect(element().querySelector('button')?.textContent).toBe('Retry');
+    expect(element().querySelector('.summary-grid')).toBeNull();
   });
 
   it('retries after an error and then renders the response', async () => {
@@ -327,6 +334,62 @@ describe('RequestList', () => {
       element().querySelector<HTMLButtonElement>('.no-matches button')?.click();
       await fixture.whenStable();
       expect(element().querySelectorAll('tbody tr')).toHaveLength(5);
+    });
+  });
+
+  describe('summary indicators', () => {
+    const demoRequests: RequestResponse[] = [
+      { id: 1, title: 'Repository access', description: '', category: 'ACCESS', priority: 'MEDIUM', status: 'OPEN', needsAttention: false, createdAt: '', updatedAt: '' },
+      { id: 2, title: 'Purchase monitors', description: '', category: 'PURCHASE', priority: 'LOW', status: 'OPEN', needsAttention: false, createdAt: '', updatedAt: '' },
+      { id: 3, title: 'Install design software', description: '', category: 'SOFTWARE', priority: 'MEDIUM', status: 'IN_PROGRESS', needsAttention: false, createdAt: '', updatedAt: '' },
+      { id: 4, title: 'Repair reception laptop', description: '', category: 'HARDWARE', priority: 'HIGH', status: 'IN_PROGRESS', needsAttention: true, createdAt: '', updatedAt: '' },
+      { id: 5, title: 'Review meeting room connection', description: '', category: 'IT_SUPPORT', priority: 'HIGH', status: 'OPEN', needsAttention: true, createdAt: '', updatedAt: '' },
+      { id: 6, title: 'Replace faulty keyboard', description: '', category: 'HARDWARE', priority: 'LOW', status: 'DONE', needsAttention: false, createdAt: '', updatedAt: '' },
+      { id: 7, title: 'Purchase duplicate software licence', description: '', category: 'PURCHASE', priority: 'HIGH', status: 'REJECTED', needsAttention: false, createdAt: '', updatedAt: '' },
+    ];
+
+    it('calculates the exact counters expected on fresh demo data in a single pass', () => {
+      const summary = calculateSummary(demoRequests);
+      expect(summary.total).toBe(7);
+      expect(summary.completed).toBe(1);
+      expect(summary.needsAttention).toBe(2);
+      expect(summary.inProgress).toBe(2);
+    });
+
+    it('returns zero values for an empty list', () => {
+      const summary = calculateSummary([]);
+      expect(summary).toEqual({ total: 0, completed: 0, needsAttention: 0, inProgress: 0 });
+    });
+
+    it('allows overlapping categories and counts REJECTED only toward total', () => {
+      const overlapping: RequestResponse[] = [
+        { id: 1, title: 'High In Progress', description: '', category: 'ACCESS', priority: 'HIGH', status: 'IN_PROGRESS', needsAttention: true, createdAt: '', updatedAt: '' },
+        { id: 2, title: 'High Rejected', description: '', category: 'ACCESS', priority: 'HIGH', status: 'REJECTED', needsAttention: false, createdAt: '', updatedAt: '' },
+      ];
+      const summary = calculateSummary(overlapping);
+      expect(summary.total).toBe(2);
+      expect(summary.inProgress).toBe(1);
+      expect(summary.needsAttention).toBe(1);
+      expect(summary.completed).toBe(0);
+    });
+
+    it('renders indicators in UI and keeps counters unchanged when filters are applied', async () => {
+      response.next(demoRequests);
+      await fixture.whenStable();
+
+      const getValues = () => Array.from(element().querySelectorAll('.summary-value')).map(el => el.textContent?.trim());
+      expect(getValues()).toEqual(['7', '1', '2', '2']);
+
+      // Filter by category: PURCHASE (only 2 match out of 7)
+      const component = fixture.componentInstance;
+      component.filterForm.controls.category.setValue('PURCHASE');
+      await fixture.whenStable();
+
+      // Table displays only 2 matching items
+      expect(element().querySelectorAll('tbody tr')).toHaveLength(2);
+
+      // Global summary indicators remain 7, 1, 2, 2 (calculated from full dataset)
+      expect(getValues()).toEqual(['7', '1', '2', '2']);
     });
   });
 });
