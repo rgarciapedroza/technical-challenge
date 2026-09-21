@@ -12,7 +12,7 @@
     <button class="button" type="button" (click)="retry()">Retry</button>
   }
   @case ('ready') {
-    <form [formGroup]="form" (ngSubmit)="submit()">
+    <form [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="saving()">
       <fieldset [disabled]="saving()">
         <legend class="visually-hidden">Request information</legend>
         <label for="title">Title</label>
@@ -38,7 +38,7 @@
         </div>
 
         <label for="category">Category</label>
-        <select id="category" formControlName="category" required aria-describedby="category-error">
+        <select id="category" formControlName="category" required [attr.aria-invalid]="form.controls.category.touched && form.controls.category.invalid" aria-describedby="category-error">
           <option value="">Select a category</option>
           @for (entry of categories; track entry[0]) { <option [value]="entry[0]">{{ entry[1] }}</option> }
         </select>
@@ -47,7 +47,7 @@
         </div>
 
         <label for="priority">Priority</label>
-        <select id="priority" formControlName="priority" required aria-describedby="priority-error">
+        <select id="priority" formControlName="priority" required [attr.aria-invalid]="form.controls.priority.touched && form.controls.priority.invalid" aria-describedby="priority-error">
           <option value="">Select a priority</option>
           @for (entry of priorities; track entry[0]) { <option [value]="entry[0]">{{ entry[1] }}</option> }
         </select>
@@ -57,7 +57,7 @@
 
         @if (editing()) {
           <label for="status">Status</label>
-          <select id="status" formControlName="status" required aria-describedby="status-error">
+          <select id="status" formControlName="status" required [attr.aria-invalid]="form.controls.status.touched && form.controls.status.invalid" aria-describedby="status-error">
             @for (entry of statuses; track entry[0]) { <option [value]="entry[0]">{{ entry[1] }}</option> }
           </select>
           <div id="status-error" class="validation">
@@ -66,6 +66,7 @@
         }
         <button class="button" type="submit">{{ saving() ? 'Saving...' : (editing() ? 'Save changes' : 'Create request') }}</button>
       </fieldset>
+      <p role="status">{{ saving() ? 'Saving request...' : '' }}</p>
       @if (saveError()) { <p role="alert">Unable to save the request. Please try again.</p> }
     </form>
   }

@@ -3,9 +3,8 @@ article { padding: 1.5rem; border: 1px solid #dce3ec; border-radius: 0.5rem; bac
 header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
 h2 { margin: 0; overflow-wrap: anywhere; }
 .description { white-space: pre-wrap; overflow-wrap: anywhere; }
-dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 1rem; }
 dt { font-weight: 600; }
 dd { margin: 0.25rem 0 0; }
-.attention { display: inline-block; padding: 0.25rem 0.5rem; color: #8b290e; background: #fff0e6; border-radius: 0.3rem; font-weight: 600; }
 .date-note { font-size: 0.875rem; color: #4b5870; }
 button { border: 0; cursor: pointer; }
