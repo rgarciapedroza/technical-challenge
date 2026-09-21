@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InternalRequestTests {
@@ -60,15 +61,17 @@ class InternalRequestTests {
     @Test
     void persistenceCallbacksPreserveCreationTimeAndRefreshUpdateTime() {
         InternalRequest request = request(RequestPriority.MEDIUM);
-        Instant beforeCreation = Instant.now();
+        Instant beforeCreation = Instant.now().truncatedTo(ChronoUnit.MICROS);
         request.onCreate();
         Instant createdAt = request.getCreatedAt();
         assertThat(createdAt).isBetween(beforeCreation, Instant.now());
         assertThat(request.getUpdatedAt()).isEqualTo(createdAt);
+        assertThat(createdAt.getNano() % 1000).isZero();
 
-        Instant beforeUpdate = Instant.now();
+        Instant beforeUpdate = Instant.now().truncatedTo(ChronoUnit.MICROS);
         request.onUpdate();
         assertThat(request.getCreatedAt()).isEqualTo(createdAt);
         assertThat(request.getUpdatedAt()).isBetween(beforeUpdate, Instant.now());
+        assertThat(request.getUpdatedAt().getNano() % 1000).isZero();
     }
 }
