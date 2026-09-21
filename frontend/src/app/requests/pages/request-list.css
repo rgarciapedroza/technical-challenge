@@ -1,0 +1,18 @@
+.intro, .date-note { color: #4b5870; }
+.date-note { font-size: 0.875rem; }
+.table-scroll { overflow-x: auto; border: 1px solid #dce3ec; border-radius: 0.5rem; background: white; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th, td { padding: 0.9rem; border-bottom: 1px solid #e7ecf3; vertical-align: top; }
+thead { background: #edf1f7; }
+tbody th { min-width: 180px; overflow-wrap: anywhere; }
+tbody tr:last-child > * { border-bottom: 0; }
+.date { white-space: nowrap; font-size: 0.875rem; }
+.badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 0.3rem; background: #edf1f7; white-space: nowrap; }
+.high, .attention { color: #8b290e; background: #fff0e6; }
+.attention { display: inline-block; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 600; }
+[data-status="DONE"] { background: #e4f3e8; color: #205c32; }
+[data-status="IN_PROGRESS"] { background: #e5edff; color: #254eac; }
+.empty, .error { padding: 1.5rem; border: 1px solid #dce3ec; border-radius: 0.5rem; background: white; }
+.error { border-color: #ba493b; }
+button { border: 0; cursor: pointer; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
