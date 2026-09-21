@@ -30,8 +30,8 @@
         <p class="description">{{ state.request.description }}</p>
         <dl>
           <div><dt>Category</dt><dd>{{ categories[state.request.category] }}</dd></div>
-          <div><dt>Priority</dt><dd>{{ priorities[state.request.priority] }}</dd></div>
-          <div><dt>Status</dt><dd>{{ statuses[state.request.status] }}</dd></div>
+          <div><dt>Priority</dt><dd><span class="badge" [class.high]="state.request.priority === 'HIGH'">{{ priorities[state.request.priority] }}</span></dd></div>
+          <div><dt>Status</dt><dd><span class="badge" [attr.data-status]="state.request.status">{{ statuses[state.request.status] }}</span></dd></div>
           <div><dt>Created</dt><dd><time [attr.datetime]="state.request.createdAt">{{ state.request.createdAt | date:'dd-MM-yyyy HH:mm:ss' }}</time></dd></div>
           <div><dt>Updated</dt><dd><time [attr.datetime]="state.request.updatedAt">{{ state.request.updatedAt | date:'dd-MM-yyyy HH:mm:ss' }}</time></dd></div>
         </dl>
