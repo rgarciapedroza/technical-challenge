@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "app.seed-demo-data",
+      "type": "java.lang.Boolean",
+      "description": "Whether to insert demo requests at startup when the requests table is empty.",
+      "defaultValue": true
+    }
+  ]
+}

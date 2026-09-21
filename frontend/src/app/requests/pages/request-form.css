@@ -1,0 +1,11 @@
+h1 { margin-top: 1rem; }
+form { max-width: 720px; padding: 1.5rem; border: 1px solid #dce3ec; border-radius: 0.5rem; background: white; }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+label { display: block; margin: 0.75rem 0 0.25rem; font-weight: 600; }
+input, textarea, select { width: 100%; padding: 0.65rem; border: 1px solid #67758b; border-radius: 0.3rem; background: white; color: inherit; }
+textarea { resize: vertical; }
+.validation, [role="alert"] { color: #a12a20; }
+.validation p { margin: 0.3rem 0; }
+button { margin-top: 1.25rem; border: 0; cursor: pointer; }
+fieldset:disabled { opacity: 0.7; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }

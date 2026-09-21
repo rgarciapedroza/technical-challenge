@@ -1,0 +1,138 @@
+<h1>Requests</h1>
+<p class="intro">Track internal requests and identify those that need attention.</p>
+
+@if (state$ | async; as state) {
+  @switch (state.status) {
+    @case ('loading') {
+      <p role="status">Loading requests...</p>
+    }
+    @case ('error') {
+      <div class="error">
+        <p role="alert">Unable to load requests.</p>
+        <button class="button" type="button" (click)="retry()">Retry</button>
+      </div>
+    }
+    @case ('loaded') {
+      <section class="summary-grid" aria-label="Requests summary">
+        <div class="summary-card">
+          <span class="summary-label">Total requests</span>
+          <span class="summary-value">{{ state.summary.total }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Completed</span>
+          <span class="summary-value">{{ state.summary.completed }}</span>
+        </div>
+        <div class="summary-card attention-card">
+          <span class="summary-label">Needs attention</span>
+          <span class="summary-value">{{ state.summary.needsAttention }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">In progress</span>
+          <span class="summary-value">{{ state.summary.inProgress }}</span>
+        </div>
+      </section>
+
+      @if (state.allRequests.length === 0) {
+        <div class="empty">
+          <p role="status">No requests found.</p>
+          <a routerLink="/requests/new">Create a request</a>
+        </div>
+      } @else {
+        <form class="filters-toolbar" [formGroup]="filterForm" (ngSubmit)="$event.preventDefault()" aria-label="Search and filter requests">
+          <div class="filter-group">
+            <label for="filter-search">Search title</label>
+            <input
+              id="filter-search"
+              type="search"
+              formControlName="search"
+              placeholder="Search by title..."
+            />
+          </div>
+          <div class="filter-group">
+            <label for="filter-category">Category</label>
+            <select id="filter-category" formControlName="category">
+              <option value="ALL">All categories</option>
+              @for (category of categoryOptions; track category[0]) {
+                <option [value]="category[0]">{{ category[1] }}</option>
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filter-priority">Priority</label>
+            <select id="filter-priority" formControlName="priority">
+              <option value="ALL">All priorities</option>
+              @for (priority of priorityOptions; track priority[0]) {
+                <option [value]="priority[0]">{{ priority[1] }}</option>
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filter-status">Status</label>
+            <select id="filter-status" formControlName="status">
+              <option value="ALL">All statuses</option>
+              @for (status of statusOptions; track status[0]) {
+                <option [value]="status[0]">{{ status[1] }}</option>
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filter-sort">Sort by</label>
+            <select id="filter-sort" formControlName="sort">
+              <option value="A-Z">Title A–Z</option>
+              <option value="Z-A">Title Z–A</option>
+              <option value="NEWEST">Newest first</option>
+              <option value="OLDEST">Oldest first</option>
+            </select>
+          </div>
+          <button class="button-secondary" type="button" (click)="clearFilters()">
+            Clear filters
+          </button>
+        </form>
+
+        @if (state.requests.length === 0) {
+          <div class="no-matches">
+            <p role="status">No requests match the selected filters.</p>
+            <button class="button-secondary" type="button" (click)="clearFilters()">Clear filters</button>
+          </div>
+        } @else {
+          <p class="date-note">Dates and times are shown in your local time zone.</p>
+          <div class="table-scroll" role="region" aria-label="Requests table" tabindex="0">
+            <table>
+              <caption class="visually-hidden">Internal requests with priority, status and dates</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Title</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Priority</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Attention</th>
+                  <th scope="col">Created</th>
+                  <th scope="col">Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (request of state.requests; track request.id) {
+                  <tr>
+                    <th scope="row"><a [routerLink]="['/requests', request.id]">{{ request.title }}</a></th>
+                    <td>{{ categories[request.category] }}</td>
+                    <td><span class="badge" [class.high]="request.priority === 'HIGH'">{{ priorities[request.priority] }}</span></td>
+                    <td><span class="badge" [attr.data-status]="request.status">{{ statuses[request.status] }}</span></td>
+                    <td>
+                      @if (request.needsAttention) {
+                        <span class="attention">Needs attention</span>
+                      } @else {
+                        <span aria-label="Does not need attention">—</span>
+                      }
+                    </td>
+                    <td class="date"><time [attr.datetime]="request.createdAt">{{ request.createdAt | date:'dd-MM-yyyy HH:mm:ss' }}</time></td>
+                    <td class="date"><time [attr.datetime]="request.updatedAt">{{ request.updatedAt | date:'dd-MM-yyyy HH:mm:ss' }}</time></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  }
+}
